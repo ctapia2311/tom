@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Pet Game</title>
+</head>
+
+<body>
+
+	<input type="text" id="toms-name" placeholder="Enter Tom's name" />
+	<button onclick="main()">Run</button>
+
+	<div class="gameStart" id="gameStart">
+		<p>Name: <span id="name-display"></span></p>
+		<p>Health: <span id="health-display"></span></p>
+		<p>Sleepiness: <span id="sleep-display"></span></p>
+		<p>Affection: <span id="affection-display">0</span></p>
+		<p>Hunger: <span id="hunger-display"></span></p>
+		<span id="face-display" onclick="bond()">(•‿•)</span>
+	</div>
+
+	<div class="controls" id="controls">
+		<button id="heal" onclick="healTom()">Heal</button>
+		<button id="feed" onclick="feedTom()">Feed</button>
+	</div>
+
+	<script>
+		function main() {
+			let tom = {
+				name: '',
+				health: 100,
+				age: 0,
+				sleepy: 0,
+				hunger: 0,
+				fun: 0,
+				affection: 0
+			};
+
+			let gameOver = false;
+
+
+			function updateFace() {
+				let faceDisplay = document.getElementById('face-display');
+				if (tom.health <= 0) {
+					faceDisplay.innerHTML = "✝ R.I.P ✝";
+				} else if (tom.health < 50) {
+					faceDisplay.innerHTML = "(╥_╥)";
+				} else {
+					faceDisplay.innerHTML = "(•‿•)";
+				}
+			}
+
+
+			window.healTom = function () {
+				if (!gameOver && tom.health > 0) {
+					tom.health = 100;
+					document.getElementById('health-display').innerHTML = `${Math.floor(tom.health)}`;
+					console.log('Tom healed to full health:', tom.health);
+					updateFace();
+				} else {
+					console.log("Tom is dead and cannot be healed.");
+				}
+			};
+
+
+			window.feedTom = function () {
+				if (!gameOver && tom.hunger > 0) {
+					tom.hunger -= 10;
+					if (tom.hunger < 0) tom.hunger = 0;
+					document.getElementById('hunger-display').innerHTML = `${tom.hunger}`;
+					console.log('Tom was fed, hunger reduced:', tom.hunger);
+				}
+			};
+
+
+			window.bond = function () {
+				let affectionDisplay = document.getElementById('affection-display');
+				if (!gameOver) {
+					if (tom.health < 50) {
+						tom.affection -= 5;
+					} else {
+						tom.affection += 5;
+					}
+					affectionDisplay.innerHTML = `${tom.affection}`;
+					console.log('Affection updated:', tom.affection);
+				} else {
+					console.log("Tom is dead. No more bonding.");
+				}
+			};
+
+
+			if (!gameOver) {
+				tom.name = document.getElementById('toms-name').value;
+				let nameDisplay = document.getElementById('name-display');
+				let sleepDisplay = document.getElementById('sleep-display');
+				let healthDisplay = document.getElementById('health-display');
+				let affectionDisplay = document.getElementById('affection-display');
+				let hungerDisplay = document.getElementById('hunger-display');
+
+				nameDisplay.innerHTML = `${tom.name}`;
+				sleepDisplay.innerHTML = `${Math.floor(tom.sleepy)}`;
+				healthDisplay.innerHTML = `${Math.floor(tom.health)}`;
+				affectionDisplay.innerHTML = `${tom.affection}`;
+				hungerDisplay.innerHTML = `${tom.hunger}`;
+
+
+				let healthInterval = setInterval(function () {
+					if (tom.health > 0) {
+
+						let healthDepletion = (tom.hunger >= 50) ? 1 : 0.25;
+						tom.health -= healthDepletion;
+						healthDisplay.innerHTML = `${Math.floor(tom.health)}`;
+						updateFace();
+					} else {
+						clearInterval(healthInterval);
+						clearInterval(sleepInterval);
+						clearInterval(hungerInterval);
+						gameOver = true;
+						updateFace();
+						console.log("Tom's health is zero. Game Over!");
+					}
+				}, 1000);
+
+
+				let hungerInterval = setInterval(function () {
+					if (!gameOver && tom.hunger < 100) {
+						tom.hunger += 1;
+						hungerDisplay.innerHTML = `${Math.floor(tom.hunger)}`;
+					}
+				}, 15000);
+
+
+				let sleepInterval = setInterval(function () {
+					if (!gameOver && tom.sleepy < 100) {
+						tom.sleepy += 0.1;
+						sleepDisplay.innerHTML = `${Math.floor(tom.sleepy)}`;
+					}
+				}, 1000);
+			}
+		}
+	</script>
+</body>
+
+</html>
